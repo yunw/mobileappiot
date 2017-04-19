@@ -1,0 +1,58 @@
+extends layout
+
+block content
+	.row
+		.twelve.columns.text-center
+			.panel
+				h1 rPi Servo Controller
+				h5.subheader 
+					| <strong>mobile app iot class</strong> task3 - space to control the servo
+					| hooked up to this Raspberry Pi
+	.row
+		.six.columns.centered
+			.panel
+				.row
+					.six.columns.centered.text-center 
+						h3#sliderOutput 5
+						input(type='range', min='1', max='180', step='1')
+						br
+						br
+						a#blinkButton.button.alert GO!
+						hr
+				.row
+					.six.columns
+						a.button.large.sthleft On
+					.six.columns
+						a.button.large.something Off
+				.row
+					hr
+					.six.columns.centered.text-center
+						| Tempreture
+						h2#tempInfo
+						| Humidity
+						h2#humidityInfo 
+						h4.subheader To be continued
+				.div
+
+	script(type='text/javascript')
+		$(document).ready(function() {
+			$("#blinkButton").on('click', function() {
+				$.get('/blink', function() {});
+			});             
+			$('.sthleft').on('click', function() {
+				$.get('/turnOnLED');
+			});
+			$('.something').on('click', function() {
+				$.get('/turnOffLED');
+			});     
+			var t = null;
+			$.getJSON('http://raspberrypit3.local:8484/pi/sensors', function(data) {
+				//alert(data.temperature.value);
+				//alert(data.humidity.value);
+				$("#tempInfo").html("<span style='color:blue'>"+data.temperature.value+"</span>");
+				$("#humidityInfo").html("<span style='color:blue'>"+data.humidity.value+"</span>");
+			});
+		});
+
+		
+
