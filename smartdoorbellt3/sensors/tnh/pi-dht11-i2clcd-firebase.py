@@ -97,20 +97,41 @@ def main():
   
   while True:
 	#get DHT11 sensor value
-	result = instance.read()
-    # Send some test
+    result = instance.read()
+      # Send some test
 
-	if result.is_valid():
-		lcd_string("temp:"+str(result.temperature)+" C",LCD_LINE_1)
-		lcd_string("humid:"+str(result.humidity)+"%",LCD_LINE_2)
-		time.sleep(3) # 3 second delay
-		lcd_string("Hello Class: ",LCD_LINE_1)
-		lcd_string("demo from Irene",LCD_LINE_2)
-		time.sleep(3)
-    client = http.client.HTTPSConnection('smarthome-c4f9f.firebaseio.com')
-    client.request('PUT','/sensors/tempHumidity.json', '{"isOn":true}')
-    response = client.getresponse()
-    print (response.reason)
+    if result.is_valid():
+      lcd_string("temp: "+str(result.temperature)+" C",LCD_LINE_1)
+      lcd_string("humidity: "+str(result.humidity)+"%",LCD_LINE_2)
+      time.sleep(3) # 3 second delay
+      lcd_string("Welcome to T3's HOME: ",LCD_LINE_1)
+      lcd_string("demo from T3",LCD_LINE_2)
+      time.sleep(3)
+      # print (result.temperature, result.humidity)
+      client = http.client.HTTPSConnection('smarthome-c4f9f.firebaseio.com')
+      # client.request('PUT','/sensors/tempHumidity.json', '{"isOn":true}')
+    ## { "temp": “25”, "humidity": "17" } 
+      tsensor_tmp={"temp": result.temperature, "humidity": result.humidity}
+      th_sensor=json.dumps(tsensor_tmp)
+      #print (tsensor_tmp)
+      client.request('PUT','/deviceTest/1/current/sensors/tempHumidity.json', th_sensor)
+      #client.request('PUT','/deviceTest/1/current/sensors.json', th_sensor) 
+#      client.request('PUT','/sensors/tempHumidity.json', '{"temp":str(result.temperature)}')
+
+#      client.request('PUT','/sensors/tempHumidity.json', '{"humidity":str(result.humidity)}') 
+      response = client.getresponse()
+      print (response.reason, response.read())
+      
+      client.request('GET', '/deviceTest/1/current/sensors/proximityWarning/isClose.json')
+
+      ifClose = client.getresponse().read().decode()
+      print (ifClose)      
+#print(ifClose.status, ifClose.reason, ifClose.read())
+      if ifClose == 'true':
+        #print ("someone intruded!")
+        lcd_string("Warning !! ",LCD_LINE_1)
+        lcd_string("Someone intruded!! ",LCD_LINE_2) 
+        time.sleep(3)
  
 if __name__ == '__main__':
 
@@ -120,4 +141,5 @@ if __name__ == '__main__':
     pass
   finally:
     lcd_byte(0x01, LCD_CMD)
+
 
